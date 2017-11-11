@@ -16,7 +16,7 @@ memsizes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 20, 50, 100, 500]
 
 
 memlen = 4
-newProb = 0.1
+newProb = 0.05
 switchProb = 0.2
 
 g = list()
@@ -95,8 +95,7 @@ for episodes in tqdm(range(1)):
             if i.explore:
                 c1 += 1
         exp.append(c1 * 100 / len(agents))
-        if j % 50 == 19:
-            # print("Society Stuff")
+        if j % 50 == 55:
             # print(len(agentTemp))
             # print(np.sum([len(j.memory) for j in agentTemp]))
             spots = list()
@@ -111,12 +110,12 @@ for episodes in tqdm(range(1)):
                             spots.append(j)
 
             # Redistribute them acc to spots
-            print(totalEnergy, len(agents))
+            # print(totalEnergy, len(agents))
             numexplorer = c1
             numexploiter = len(agents) - c1
-            print(numexplorer)
-            print(numexploiter)
-            explorerPerc = 0.75
+            # print(numexplorer)
+            # print(numexploiter)
+            explorerPerc = 0.65
             if len(spots) > 0:
                 for i in agents:
                     if i.explore and numexplorer:
@@ -125,6 +124,9 @@ for episodes in tqdm(range(1)):
                         i.energy = (1 - explorerPerc) * (totalEnergy) * (1 / numexploiter)
                     if not i.explore:
                         m = random.choice(spots)
+                        i.memory = list()
+                        i.memoryProcess(m, True)
+
                         world.step(i, m[0], m[1])
     g.append(utils.compute_gini(wealth))
     # l.append(np.mean(lifetimes))
@@ -138,13 +140,20 @@ print("Percentage that lived entire life", np.mean(p))
 # print(len(np.nonzero(p)[0]))
 # print(sum(p) / len(np.nonzero(p)[0]))
 
+print("for exploiter")
 print("Median Life", np.median(l))
 print("Mean Life", np.mean(l))
 print("Life Gini", utils.compute_gini(l))
+
 print("for explorer")
 print("Median Life", np.median(lexp))
 print("Mean Life", np.mean(lexp))
 print("Life Gini", utils.compute_gini(lexp))
+
+print("combined")
+print("Median Life", np.median(lexp + l))
+print("Mean Life", np.mean(lexp + l))
+print("Life Gini", utils.compute_gini(lexp + l))
 # plt.hist(l, bins=30)
 # plt.show()
 print("Number of Agents", c)
