@@ -32,16 +32,17 @@ class Jericho(object):
         self.world = np.zeros((self.size, self.sizeW))
         self.time = 0
 
-        self.sourceNum = int((self.size * self.sizeW) ** 0.25) * 3
+        self.sourceNum = int((self.size * self.sizeW) ** 0.25) * 2
+        print(self.sourceNum)
 
         self.sources = np.zeros((self.sourceNum, 3))
         for k in range(self.sourceNum):
             i, j = random.randrange(self.size - 1), random.randrange(self.sizeW - 1)
-            d = random.choice([0.5, 0.5, 0.5])
+            d = random.choice([0.3, 0.3, 0.3])
             self.sources[k] = [i, j, d]
 
         self.sparseCount = 0
-        self.sparsity = 2
+        self.sparsity = 15
         self.idealsparseCount = self.size * self.sizeW * self.sparsity * 0.01
 
         self._reset_world()
@@ -49,7 +50,8 @@ class Jericho(object):
         self.agentList = list()
 
         self.idCount = 1
-        self.denseAmout = 10
+        self.denseAmout = 9
+        self.sparseAmount = 2
 
 
     def _reset_world(self):
@@ -78,7 +80,10 @@ class Jericho(object):
                     print(" ", end="|")
                 elif self.world[i][j] > -1:
                     ag = self.agentList[int(self.world[i][j] - 1)]
-                    print('\x1b[6;30;44m' + str(len(ag.memory)) + '\x1b[0m', end="|")
+                    if ag.explore:
+                        print('\x1b[6;30;41m' + str(len(ag.memory)) + '\x1b[0m', end="|")
+                    else:
+                        print('\x1b[6;30;44m' + str(len(ag.memory)) + '\x1b[0m', end="|")
                     # if ag.alive:
                         # print('\x1b[6;30;44m' + str(int(self.world[i][j])) + '\x1b[0m', end="|")
                         # print('\x1b[6;30;44m' + 'a' + '\x1b[0m', end="|")
@@ -143,7 +148,7 @@ class Jericho(object):
         if self.world[i][j] == -8:
             self.sparseCount -= 1
             energy = 4
-            self.spareStats += 4
+            self.spareStats += self.sparseAmount
         elif self.world[i][j] == -9:
             energy = self.denseAmout
             self.denseStats += 7
